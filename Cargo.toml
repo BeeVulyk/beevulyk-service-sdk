@@ -1,0 +1,83 @@
+[package]
+name = "beevulyk-service-sdk"
+version = "0.1.0"
+edition = "2024"
+description = "BeeVulyk service SDK: runtime building blocks for Axum HTTP + tonic gRPC services with Prometheus metrics, structured JSON logs, and optional integrations (sqlx, redis, kafka, GraphQL). Fork of ITYFT/yft-service-sdk."
+repository = "https://github.com/BeeVulyk/beevulyk-service-sdk"
+homepage = "https://github.com/BeeVulyk/beevulyk-service-sdk"
+documentation = "https://github.com/BeeVulyk/beevulyk-service-sdk"
+license = "MIT"
+
+[features]
+default = []
+full = [
+    "ws",
+    "ql",
+    "postgresql",
+    "redis",
+    "kafka",
+    "grpc",
+]
+
+ws = ["axum/ws"]
+
+ql = ["dep:async-graphql", "dep:async-graphql-axum"]
+
+postgresql = ["dep:sqlx", "sqlx/postgres", "beevulyk-service-sdk-macros/postgresql"]
+
+sqlite = ["dep:sqlx", "sqlx/sqlite", "beevulyk-service-sdk-macros/postgresql"]
+
+redis = ["dep:redis", "beevulyk-service-sdk-macros/redis"]
+
+kafka = ["dep:rdkafka", "beevulyk-service-sdk-macros/kafka"]
+
+grpc = ["dep:futures-core", "dep:beevulyk-grpc-extensions"]
+grpc_metrics_disabled = ["beevulyk-tonic-prometheus/grpc_metrics_disabled"]
+
+macros = [
+    "beevulyk-grpc-extensions?/grpc-server",
+    "beevulyk-grpc-extensions?/grpc-client",
+    "beevulyk-service-sdk-macros/grpc",
+]
+
+[dependencies]
+beevulyk-rust-extensions = { git = "https://github.com/BeeVulyk/beevulyk-rust-extensions.git", tag = "0.1.0", features = [
+    "app-states",
+    "timers",
+] }
+
+redis = { optional = true, version = "0.28", features = ["tokio-comp", "connection-manager"] }
+rdkafka = { optional = true, version = "0.37", features = ["cmake-build"] }
+beevulyk-grpc-extensions = { optional = true, git = "https://github.com/BeeVulyk/beevulyk-grpc-extensions.git", tag = "0.1.0" }
+futures-core = { version = "*", optional = true }
+
+reqwest = { version = "0.12.20", features = ["json"] }
+tower-http = { version = "*", features = ["limit"] }
+
+beevulyk-service-sdk-macros = { git = "https://github.com/BeeVulyk/beevulyk-service-sdk-macros.git", tag = "0.1.0" }
+beevulyk-tonic-prometheus = { git = "https://github.com/BeeVulyk/beevulyk-tonic-prometheus.git", tag = "0.1.0" }
+envy = "0.4"
+
+async-graphql = { version = "*", optional = true, features = ["chrono"] }
+async-graphql-axum = { version = "*", optional = true }
+
+uuid = { version = "*", features = ["v4"] }
+tower = "*"
+tokio = "*"
+axum = { version = "0.8.4", features = ["macros"] }
+async-trait = "*"
+serde_json = { version = "*" }
+serde = { version = "*", features = ["derive"] }
+prometheus = "0.14.0"
+hyper = "*"
+futures = "*"
+sqlx = { version = "0.8", optional = true, features = [
+    "runtime-tokio",
+    "derive",
+    "chrono",
+] }
+lazy_static = "*"
+tracing = "*"
+tracing-subscriber = { version = "*", features = ["env-filter"] }
+chrono = { version = "*", features = ["serde"] }
+http = "*"
